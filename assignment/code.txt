@@ -1,0 +1,186 @@
+let img, video;
+let handpose, detections;
+let pressed_f=false, pressed_v=false, pressed_c=false;
+let history=[], circleHistory=[];
+let c;
+
+function setup() {
+  createCanvas(1170,390);
+  img=loadImage('images/town.jpg')
+  blurred=loadImage('images/town.jpg')
+  
+  video=createCapture(VIDEO)
+  video.size(width/2, height)
+  video.hide()
+
+  handpose=ml5.handpose(video, modelReady);
+  handpose.on("hand", gotResults);
+}
+
+function modelReady(){console.log('model ready');}
+
+function gotResults(results){detections=results;}
+
+function draw() {
+  //img.width=1170, img.height=780
+  image(img,0,0,img.width/2, img.height/2)
+  image(video,width/2,0,video.width,video.height)
+  
+  if(detections){
+    if(detections.length > 0){
+      drawKeypoints();      
+    }
+  }
+}
+
+function keyPressed()
+{
+  if(key=='v'){
+    applyBlur();
+  } else if(key=='e'){
+    exit();
+  } else if(key=='f'){
+    freehand();
+  } else if(key=='c'){
+    circleDrawing();
+  }
+}
+
+function drawKeypoints(){
+  noStroke();
+  fill(255,0,0);
+  
+  //fingertip of index finger
+  for(let i=0; i<detections.length; i++){
+    const detection = detections[i];
+    for (let j = 0;j<detection.landmarks.length; j++){
+        const keypoint = detection.landmarks[j];
+        if(j == 4 && pressed_c){
+          thumb_x=keypoint[0]
+          thumb_y=keypoint[1]
+          cam_thumb=thumb_x+video.width
+          ellipse(cam_thumb, thumb_y,30,30)
+        }
+      
+        if (j == 8) {
+          pointerX = keypoint[0];
+          pointerY = keypoint[1];
+          
+          //shown in image
+          if(pressed_c==false&&pressed_v==false){
+            ellipse(pointerX, pointerY, 30, 30);
+          }
+          //shown in camera
+          ellipse(pointerX+video.width, pointerY, 30, 30)
+          
+          //Freehand drawing
+          if(pressed_f){
+            history.push(createVector(pointerX, pointerY))
+            stroke(255,0,0)
+            strokeWeight(8)
+            for(let i=0;i<history.length-1;i++){
+              let pos = history[i];
+              let nextpos=history[i+1]
+              line(pos.x, pos.y, nextpos.x, nextpos.y)
+            }
+          
+          //View image
+          } else if (pressed_v){
+            //get from not blurred image then replace blur image
+            c=get(pointerX,pointerY,100,100)
+            image(blurred,0,0,blurred.width/2, blurred.height/2)
+            image(c, pointerX, pointerY)
+            ellipse(pointerX+50, pointerY+50, 30,30)
+          
+          //Circle drawing 
+          } else if (pressed_c){
+            let pxl = get(pointerX, pointerY)
+            //console.log(pxl)
+            let cdist = (sqrt(sq(thumb_x-pointerX)+sq(thumb_y-pointerY)))/2
+            circleHistory.push(new Circle(pointerX, pointerY, cdist,pxl))
+            
+            for(let i=0;i<circleHistory.length;i++){
+              circleHistory[i].display();
+              //put it here to prevent storing in circelHistory
+              fill(255,0,0)
+              ellipse(pointerX, pointerY, 30)
+            }
+            
+          }
+
+        }
+    }
+  }
+}
+
+//blur the image
+function applyBlur(){
+  //prevent draw trail when entering view image 
+  //(original drawing trail-> no drawing trail and turn blur)
+  pressed_f=false
+  pressed_c=false
+  pressed_v=true
+  empty_hist();
+  blurred.filter(BLUR,10)
+  
+}
+
+//freehand drawing
+function freehand(){
+  pressed_v=false
+  pressed_c=false
+  pressed_f=true
+  empty_hist();
+  //prevent draw trail when it is blur (blur->original)
+  loadOriginalImage()
+}
+
+//circle drawing
+function circleDrawing(){
+  pressed_f=false
+  pressed_v=false
+  pressed_c=true
+  empty_hist();
+  loadOriginalImage()
+}
+
+
+//display the original image
+//originally, img_copy load in upper part, 
+//now put it under, need to load it every render
+//if just img == img_copy (and load on upper part) -> only work once
+function exit(){
+  pressed_f=false
+  pressed_v=false
+  pressed_c=false
+  empty_hist();
+  loadOriginalImage();
+}
+
+function empty_hist(){
+  history=[]
+  circleHistory=[]
+}
+
+
+function loadOriginalImage(){
+  img_copy=loadImage('images/town.jpg')
+  img=img_copy
+}
+
+
+class Circle{
+  constructor(x,y,rd,pxl){
+    this.x=x;
+    this.y=y;
+    this.rd=rd;
+    this.pxl=pxl;
+    this.op=random(0,255);    
+  }
+
+  display(){
+    fill(this.pxl, this.op)
+    ellipse(this.x,this.y,this.rd)
+
+  }
+}
