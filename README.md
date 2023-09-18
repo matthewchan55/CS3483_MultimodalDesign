@@ -12,7 +12,7 @@ to exercise at home. Here are the characteristics of the community and the point
 to be noticed when designing the application in order to provide a smooth and convenient
 experience for the users of the application.
 
-![recording](https://github.com/matthewchan55/CS3483_MultimodalDesign/assets/75091114/5f6b159e-7f57-49b5-9ff9-3ba8de91409b)
-![nav](https://github.com/matthewchan55/CS3483_MultimodalDesign/assets/75091114/12485266-f505-4404-abbb-4a28262b6ea5)
-![exercise](https://github.com/matthewchan55/CS3483_MultimodalDesign/assets/75091114/58ab9249-fce5-4cc2-b00c-240e9e53ed6e)
-![workout](https://github.com/matthewchan55/CS3483_MultimodalDesign/assets/75091114/9ffc0118-f474-47e8-ac44-2bd32a243e87)
+![recording](/screenshots/recording.PNG)
+![nav](/screenshots/nav.PNG)
+![exercise](/screenshots/exercise.PNG)
+![workout](/screenshots/workout.PNG)
