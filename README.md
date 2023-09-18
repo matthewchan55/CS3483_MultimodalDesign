@@ -12,6 +12,8 @@ to exercise at home. Here are the characteristics of the community and the point
 to be noticed when designing the application in order to provide a smooth and convenient
 experience for the users of the application.
 
+Demo video: https://drive.google.com/drive/u/0/folders/12cojWjyLBZQrqOFiXGdnvZpQ7PwXEDiU?hl=zh-TW
+
 ![recording](/screenshots/recording.PNG)
 ![nav](/screenshots/nav.PNG)
 ![exercise](/screenshots/exercise.PNG)
